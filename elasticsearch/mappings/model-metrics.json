@@ -1,0 +1,59 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "refresh_interval": "1s"
+  },
+  "mappings": {
+    "dynamic": "true",
+    "properties": {
+      "model_name": {
+        "type": "keyword"
+      },
+      "model_type": {
+        "type": "keyword"
+      },
+      "algorithm": {
+        "type": "keyword"
+      },
+      "trained_at": {
+        "type": "date"
+      },
+      "evaluation_type": {
+        "type": "keyword"
+      },
+      "training_rows": {
+        "type": "long"
+      },
+      "test_rows": {
+        "type": "long"
+      },
+      "labels": {
+        "type": "keyword"
+      },
+      "metrics": {
+        "type": "object"
+      },
+      "confusion_matrix": {
+        "type": "object",
+        "enabled": false
+      },
+      "params": {
+        "type": "object",
+        "enabled": false
+      },
+      "feature_columns": {
+        "type": "keyword"
+      },
+      "notes": {
+        "type": "text"
+      },
+      "is_current": {
+        "type": "boolean"
+      },
+      "dataset": {
+        "type": "keyword"
+      }
+    }
+  }
+}

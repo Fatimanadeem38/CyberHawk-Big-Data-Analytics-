@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+backend/staticfiles/
+data/training/*.jsonl
+data/raw/uploads/
+data/processed/*
+!data/processed/.gitkeep
+*.log
+.venv/
+venv/
+data/datasets/**/*.csv
+
+db.sqlite3
+*.zip

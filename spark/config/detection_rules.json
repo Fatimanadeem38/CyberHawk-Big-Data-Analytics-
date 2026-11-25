@@ -1,0 +1,124 @@
+{
+  "_comment": "Configurable detection rules, checked in this order (first match wins). 'win_*' fields are counted per source IP inside one FEATURE_WINDOW_SECONDS window. Each rule can have an extra 'and' condition (which can itself contain 'and'). Restart the spark-streaming container after editing.",
+  "ml_min_probability": 0.6,
+  "anomaly_min_score": 1.0,
+  "anomaly_informational_below": 1.5,
+  "min_alert_severity": "low",
+  "dedup_window_minutes": 10,
+  "allowlist_src_ips": [
+    "10.0.0.250"
+  ],
+  "base_severity": {
+    "dos": "high",
+    "brute_force": "high",
+    "unusual_volume": "high",
+    "port_scan": "medium",
+    "suspicious_frequency": "medium",
+    "abnormal_auth": "medium",
+    "unknown_anomaly": "low"
+  },
+  "rules": [
+    {
+      "name": "repeated_failed_logins",
+      "category": "brute_force",
+      "field": "win_failed_logins",
+      "op": ">=",
+      "value": 15,
+      "description": "Repeated failed login attempts: potential brute-force activity"
+    },
+    {
+      "name": "many_destination_ports",
+      "category": "port_scan",
+      "field": "win_unique_dst_ports",
+      "op": ">=",
+      "value": 25,
+      "description": "Many destination ports accessed: potential port scanning"
+    },
+    {
+      "name": "large_outbound_transfer",
+      "category": "unusual_volume",
+      "field": "win_traffic_volume",
+      "op": ">=",
+      "value": 10000000,
+      "and": {
+        "field": "dst_is_internal",
+        "op": "==",
+        "value": 0
+      },
+      "description": "Unusual outbound traffic volume to an external address"
+    },
+    {
+      "name": "high_request_volume",
+      "category": "dos",
+      "field": "win_request_sum",
+      "op": ">=",
+      "value": 10000,
+      "description": "Very high request volume with small packets: potential DoS activity",
+      "and": {
+        "field": "win_avg_packet_size",
+        "op": "<",
+        "value": 800
+      }
+    },
+    {
+      "name": "many_destination_hosts",
+      "category": "suspicious_frequency",
+      "field": "win_unique_dst_ips",
+      "op": ">=",
+      "value": 20,
+      "description": "Unusual connection frequency to many hosts: suspicious network behaviour"
+    },
+    {
+      "name": "many_accounts_one_source",
+      "category": "abnormal_auth",
+      "field": "win_unique_usernames",
+      "op": ">=",
+      "value": 8,
+      "description": "Logins to many different accounts from one source: abnormal authentication behaviour"
+    },
+    {
+      "name": "periodic_external_connections",
+      "category": "suspicious_frequency",
+      "field": "win_conn_count",
+      "op": ">=",
+      "value": 20,
+      "and": {
+        "field": "dst_is_internal",
+        "op": "==",
+        "value": 0,
+        "and": {
+          "field": "src_is_internal",
+          "op": "==",
+          "value": 1,
+          "and": {
+            "field": "win_avg_packet_size",
+            "op": "<",
+            "value": 300
+          }
+        }
+      },
+      "description": "Internal host repeatedly connecting to an external address with small packets: possible beaconing"
+    }
+  ],
+  "datasets": {
+    "unsw_nb15": {
+      "_comment": "Used for REAL UNSW-NB15 flows (topic dataset-flows). No window rules: these flows already carry the dataset's own connection-count features. Detection = Random Forest + KMeans anomaly.",
+      "ml_min_probability": 0.5,
+      "anomaly_min_score": 1.0,
+      "anomaly_informational_below": 1.5,
+      "min_alert_severity": "low",
+      "base_severity": {
+        "backdoor": "high",
+        "shellcode": "high",
+        "worms": "high",
+        "exploits": "high",
+        "dos": "high",
+        "generic": "medium",
+        "reconnaissance": "medium",
+        "analysis": "medium",
+        "fuzzers": "low",
+        "unknown_anomaly": "low"
+      }
+    }
+  }
+}

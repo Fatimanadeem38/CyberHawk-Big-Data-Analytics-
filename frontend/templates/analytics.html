@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Traffic trends, protocols, ports and top talkers.{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <div class="text-muted small"><i class="bi bi-info-circle me-1"></i>Elasticsearch aggregations over <b>event time</b>. Click an IP to open its profile.</div>
+  <div class="ms-auto seg" id="range">
+    <button data-value="1h">1h</button><button data-value="6h">6h</button><button data-value="24h" class="active">24h</button>
+    <button data-value="7d">7d</button><button data-value="30d">30d</button>
+  </div>
+  <button class="btn btn-ghost btn-sm" id="refresh"><i class="bi bi-arrow-clockwise"></i></button>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-xl-3"><div class="card-soc kpi accent"><div class="label">Events</div><div class="value" id="k-events">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi blue"><div class="label">Traffic volume</div><div class="value" id="k-bytes">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi"><div class="label">Unique source IPs</div><div class="value" id="k-src">–</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi"><div class="label">Unique destination IPs</div><div class="value" id="k-dst">–</div></div></div>
+</div>
+
+<div class="card-soc mb-3"><div class="card-head"><h2>Network traffic trends</h2><span class="sub">events and traffic volume over time · interval <span id="interval"></span></span></div>
+  <div class="card-body"><div class="chart-box tall"><canvas id="c-traffic"></canvas></div></div></div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-8"><div class="card-soc h-100"><div class="card-head"><h2>Suspicious activity trend</h2><span class="sub">detections per interval by category</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-suspicious"></canvas></div></div></div></div>
+  <div class="col-xl-4"><div class="card-soc h-100"><div class="card-head"><h2>Protocol distribution</h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-protocols"></canvas></div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-4"><div class="card-soc h-100"><div class="card-head"><h2>Most frequently accessed ports</h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-ports"></canvas></div></div></div></div>
+  <div class="col-xl-4"><div class="card-soc h-100"><div class="card-head"><h2>Log sources</h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-sources"></canvas></div></div></div></div>
+  <div class="col-xl-4"><div class="card-soc h-100"><div class="card-head"><h2>Connection status</h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-status"></canvas></div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h2>Top source IP addresses</h2></div>
+    <div class="table-scroll short"><table class="table table-soc table-hover"><thead><tr><th>#</th><th>Source IP</th><th>Events</th><th>Threat events</th><th>Traffic</th><th style="width:30%"></th></tr></thead><tbody id="top-src"></tbody></table></div></div></div>
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h2>Top destination IP addresses</h2></div>
+    <div class="table-scroll short"><table class="table table-soc table-hover"><thead><tr><th>#</th><th>Destination IP</th><th>Events</th><th>Traffic</th><th style="width:35%"></th></tr></thead><tbody id="top-dst"></tbody></table></div></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/analytics.js' %}"></script>{% endblock %}

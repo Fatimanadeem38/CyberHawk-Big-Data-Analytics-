@@ -1,0 +1,78 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "refresh_interval": "1s"
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "alert_id": {
+        "type": "keyword"
+      },
+      "dedup_key": {
+        "type": "keyword"
+      },
+      "src_ip": {
+        "type": "ip"
+      },
+      "dst_ip": {
+        "type": "ip"
+      },
+      "dst_ips": {
+        "type": "keyword"
+      },
+      "threat_category": {
+        "type": "keyword"
+      },
+      "severity": {
+        "type": "keyword"
+      },
+      "severity_rank": {
+        "type": "integer"
+      },
+      "detection_methods": {
+        "type": "keyword"
+      },
+      "max_anomaly_score": {
+        "type": "float"
+      },
+      "max_ml_probability": {
+        "type": "float"
+      },
+      "event_count": {
+        "type": "long"
+      },
+      "first_seen": {
+        "type": "date"
+      },
+      "last_seen": {
+        "type": "date"
+      },
+      "created_at": {
+        "type": "date"
+      },
+      "updated_at": {
+        "type": "date"
+      },
+      "status": {
+        "type": "keyword"
+      },
+      "sample_event_ids": {
+        "type": "keyword"
+      },
+      "description": {
+        "type": "text"
+      },
+      "is_simulated": {
+        "type": "boolean"
+      },
+      "protocols": {
+        "type": "keyword"
+      },
+      "dst_ports": {
+        "type": "integer"
+      }
+    }
+  }
+}

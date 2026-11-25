@@ -1,0 +1,19 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "term": {
+            "src_ip": "10.0.1.0/24"
+          }
+        },
+        {
+          "term": {
+            "dst_ip": "10.0.1.0/24"
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}

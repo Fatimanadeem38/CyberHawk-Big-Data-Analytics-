@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Grouped threats for analysts to investigate and resolve.{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3" id="status-tabs">
+  <button class="btn btn-ghost btn-sm active" data-status="">All <span class="n text-muted" data-n=""></span></button>
+  <button class="btn btn-ghost btn-sm" data-status="new"><span class="dot" style="background:var(--accent)"></span> New <span class="n text-muted" data-n="new"></span></button>
+  <button class="btn btn-ghost btn-sm" data-status="investigating"><span class="dot" style="background:var(--medium)"></span> Investigating <span class="n text-muted" data-n="investigating"></span></button>
+  <button class="btn btn-ghost btn-sm" data-status="resolved"><span class="dot" style="background:var(--low)"></span> Resolved <span class="n text-muted" data-n="resolved"></span></button>
+  <button class="btn btn-ghost btn-sm" data-status="false_positive"><span class="dot" style="background:var(--info)"></span> False positive <span class="n text-muted" data-n="false_positive"></span></button>
+</div>
+
+<div class="card-soc mb-3"><div class="card-body"><div class="filters">
+  <div class="f"><label class="form-label">Severity</label>
+    <select class="form-select" id="f-severity"><option value="">All</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>informational</option></select></div>
+  <div class="f"><label class="form-label">Category</label>
+    <select class="form-select" id="f-category"><option value="">All</option><option>brute_force</option><option>port_scan</option><option>dos</option><option>suspicious_frequency</option><option>unusual_volume</option><option>abnormal_auth</option><option>unknown_anomaly</option><optgroup label="Real dataset (UNSW-NB15)"><option>generic</option><option>exploits</option><option>fuzzers</option><option>reconnaissance</option><option>analysis</option><option>backdoor</option><option>shellcode</option><option>worms</option></optgroup></select></div>
+  <div class="f" style="min-width:230px"><label class="form-label">Search by IP / alert ID</label><input class="form-control" id="f-q" placeholder="IP, CIDR or alert id"></div>
+  <div class="f"><label class="form-label">Last seen</label>
+    <select class="form-select" id="f-range"><option value="1h">Last hour</option><option value="24h">Last 24 hours</option><option value="7d" selected>Last 7 days</option><option value="30d">Last 30 days</option><option value="all">All time</option></select></div>
+  <div class="f"><label class="form-label">Sort by</label>
+    <select class="form-select" id="f-sort"><option value="last_seen">Most recent</option><option value="severity_rank">Highest severity</option><option value="event_count">Most events</option></select></div>
+</div></div></div>
+
+<div class="card-soc">
+  <div class="card-head"><h2><i class="bi bi-bell me-1"></i>Security alerts</h2><span class="sub" id="total"></span><div class="ms-auto" id="pager"></div></div>
+  <div class="table-scroll" style="max-height: calc(100vh - 340px)"><table class="table table-soc table-hover">
+    <thead><tr><th>Severity</th><th>Threat category</th><th>Source IP</th><th>Destination IP</th><th>Events</th><th>Detection method</th><th>Score</th><th>First seen</th><th>Last seen</th><th>Status</th><th>Assigned</th><th></th></tr></thead>
+    <tbody id="body"><tr><td colspan="12" class="empty">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/alerts.js' %}"></script>{% endblock %}

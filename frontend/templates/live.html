@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Every incoming security event, newest first, as Spark scores it.{% endblock %}
+{% block content %}
+<div class="card-soc mb-3"><div class="card-body">
+  <div class="filters">
+    <div class="f flex-grow-1" style="max-width:320px"><label class="form-label">Search</label>
+      <input class="form-control" id="f-q" placeholder="IP (e.g. 10.0.1.15) or text"></div>
+    <div class="f"><label class="form-label">Protocol</label>
+      <select class="form-select" id="f-protocol"><option value="">All</option><option>TCP</option><option>UDP</option><option>ICMP</option><option>OTHER</option></select></div>
+    <div class="f"><label class="form-label">Severity</label>
+      <select class="form-select" id="f-severity"><option value="">All</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>informational</option><option value="none">none (normal)</option></select></div>
+    <div class="f"><label class="form-label">Predicted class</label>
+      <select class="form-select" id="f-class"><option value="">All</option><option>normal</option><option>brute_force</option><option>port_scan</option><option>dos</option><option>suspicious_frequency</option><option>unusual_volume</option><option>abnormal_auth</option><optgroup label="Real dataset (UNSW-NB15)"><option>generic</option><option>exploits</option><option>fuzzers</option><option>reconnaissance</option><option>analysis</option><option>backdoor</option><option>shellcode</option><option>worms</option></optgroup></select></div>
+    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="f-threats"><label class="form-check-label small" for="f-threats">Threats only</label></div>
+    <div class="ms-auto d-flex gap-2 align-items-end">
+      <div class="text-end me-2"><div class="form-label mb-0">Incoming</div><div class="mono" id="rate">0 ev/s</div></div>
+      <button class="btn btn-ghost" id="btn-pause"><i class="bi bi-pause-fill"></i> Pause</button>
+      <button class="btn btn-ghost" id="btn-clear" title="Clear table"><i class="bi bi-trash3"></i></button>
+    </div>
+  </div>
+</div></div>
+
+<div class="card-soc">
+  <div class="card-head"><h2><i class="bi bi-activity me-1"></i>Incoming security events</h2>
+    <span class="sub" id="live-info">newest first · keeps the latest 250 rows</span>
+    <span class="ms-auto small text-muted" id="live-count"></span></div>
+  <div class="table-scroll" style="max-height: calc(100vh - 300px)"><table class="table table-soc table-hover">
+    <thead><tr><th>Timestamp</th><th>Source IP</th><th>Destination IP</th><th>Protocol</th><th>Event type</th><th>Source</th><th>Predicted class</th><th>Anomaly</th><th>Threat severity</th></tr></thead>
+    <tbody id="live-body"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="modal fade" id="eventModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Event details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body" id="eventModalBody"></div>
+</div></div></div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/live.js' %}"></script>{% endblock %}

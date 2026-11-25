@@ -1,0 +1,28 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "severity": [
+              "critical",
+              "high"
+            ]
+          }
+        },
+        {
+          "term": {
+            "threat_category": "brute_force"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "gte": "now-24h"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

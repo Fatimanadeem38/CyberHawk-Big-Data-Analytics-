@@ -1,0 +1,144 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "refresh_interval": "1s"
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "event_id": {
+        "type": "keyword"
+      },
+      "event_time": {
+        "type": "date"
+      },
+      "processed_at": {
+        "type": "date"
+      },
+      "kafka_timestamp": {
+        "type": "date"
+      },
+      "kafka_topic": {
+        "type": "keyword"
+      },
+      "event_date": {
+        "type": "keyword"
+      },
+      "src_ip": {
+        "type": "ip"
+      },
+      "dst_ip": {
+        "type": "ip"
+      },
+      "src_port": {
+        "type": "integer"
+      },
+      "dst_port": {
+        "type": "integer"
+      },
+      "protocol": {
+        "type": "keyword"
+      },
+      "packet_size": {
+        "type": "long"
+      },
+      "duration": {
+        "type": "float"
+      },
+      "request_count": {
+        "type": "long"
+      },
+      "failed_logins": {
+        "type": "integer"
+      },
+      "event_type": {
+        "type": "keyword"
+      },
+      "network_status": {
+        "type": "keyword"
+      },
+      "log_source": {
+        "type": "keyword"
+      },
+      "username": {
+        "type": "keyword"
+      },
+      "is_simulated": {
+        "type": "boolean"
+      },
+      "scenario": {
+        "type": "keyword"
+      },
+      "true_label": {
+        "type": "keyword"
+      },
+      "bytes_total": {
+        "type": "long"
+      },
+      "win_conn_count": {
+        "type": "long"
+      },
+      "win_failed_logins": {
+        "type": "long"
+      },
+      "win_unique_dst_ports": {
+        "type": "long"
+      },
+      "win_unique_dst_ips": {
+        "type": "long"
+      },
+      "win_unique_usernames": {
+        "type": "long"
+      },
+      "win_traffic_volume": {
+        "type": "long"
+      },
+      "win_request_sum": {
+        "type": "long"
+      },
+      "win_avg_packet_size": {
+        "type": "float"
+      },
+      "predicted_class": {
+        "type": "keyword"
+      },
+      "ml_probability": {
+        "type": "float"
+      },
+      "attack_probability": {
+        "type": "float"
+      },
+      "anomaly_score": {
+        "type": "float"
+      },
+      "is_anomaly": {
+        "type": "boolean"
+      },
+      "rule_category": {
+        "type": "keyword"
+      },
+      "threat_category": {
+        "type": "keyword"
+      },
+      "detection_methods": {
+        "type": "keyword"
+      },
+      "severity": {
+        "type": "keyword"
+      },
+      "severity_rank": {
+        "type": "integer"
+      },
+      "is_threat": {
+        "type": "boolean"
+      },
+      "alert_id": {
+        "type": "keyword"
+      },
+      "batch_id": {
+        "type": "long"
+      }
+    }
+  }
+}

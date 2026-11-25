@@ -1,0 +1,35 @@
+{
+  "size": 0,
+  "aggs": {
+    "top_src": {
+      "terms": {
+        "field": "src_ip",
+        "size": 10
+      }
+    },
+    "top_ports": {
+      "terms": {
+        "field": "dst_port",
+        "size": 10
+      }
+    },
+    "protocols": {
+      "terms": {
+        "field": "protocol"
+      }
+    },
+    "bytes_over_time": {
+      "date_histogram": {
+        "field": "event_time",
+        "fixed_interval": "30m"
+      },
+      "aggs": {
+        "bytes": {
+          "sum": {
+            "field": "bytes_total"
+          }
+        }
+      }
+    }
+  }
+}

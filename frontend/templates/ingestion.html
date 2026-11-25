@@ -1,0 +1,107 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Control the log generator, replay real flows or upload logs.{% endblock %}
+{% block content %}
+<div class="banner info mb-3"><i class="bi bi-shield-exclamation fs-5"></i><div class="small">
+  The log generator produces <b>SIMULATED</b> security events for testing. Every simulated event is marked <span class="sim-tag">sim</span>
+  and uses reserved documentation addresses (192.0.2.x, 198.51.100.x, 203.0.113.x) for "external" hosts. These are not real attacks.
+  This platform detects and alerts. It does not block traffic.</div></div>
+
+{% if not is_admin_role %}<div class="banner warn mb-3"><i class="bi bi-lock"></i>Read-only view: only Administrators can start or stop ingestion, simulate attacks or upload files.</div>{% endif %}
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-5"><div class="card-soc h-100">
+    <div class="card-head"><h3><i class="bi bi-broadcast me-1"></i>Log generator</h3><span class="ms-auto" id="gen-status"></span></div>
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <button class="btn btn-lg btn-accent flex-grow-1" id="btn-toggle" {% if not is_admin_role %}disabled{% endif %}><i class="bi bi-play-fill"></i> Start ingestion</button>
+      </div>
+      <label class="form-label d-flex justify-content-between">Normal events per second <span class="mono" id="rate-val">8</span></label>
+      <input type="range" class="form-range mb-3" id="rate" min="1" max="50" value="8" {% if not is_admin_role %}disabled{% endif %}>
+      <label class="form-label d-flex justify-content-between">Random simulated attacks <span class="mono" id="prob-val">2%</span></label>
+      <input type="range" class="form-range" id="prob" min="0" max="20" value="2" {% if not is_admin_role %}disabled{% endif %}>
+      <div class="small text-muted mb-3">Chance per second that a random simulated attack burst starts.</div>
+      <button class="btn btn-ghost w-100" id="btn-save" {% if not is_admin_role %}disabled{% endif %}><i class="bi bi-sliders me-1"></i>Apply rate settings</button>
+      <hr class="border-secondary-subtle">
+      <div id="gen-metrics"></div>
+    </div>
+  </div></div>
+
+  <div class="col-xl-7"><div class="card-soc h-100">
+    <div class="card-head"><h3><i class="bi bi-bug me-1"></i>Simulate an attack scenario</h3><span class="sub">controlled test bursts · works even while ingestion is paused</span></div>
+    <div class="card-body"><div class="row g-2">
+      {% for key, label in scenarios %}
+      <div class="col-md-6"><button class="btn btn-ghost scenario-btn" data-scenario="{{ key }}" {% if not is_admin_role %}disabled{% endif %}>
+        <div class="t"><i class="bi bi-lightning me-1 text-warning"></i>{{ label }}</div>
+        <div class="d mono">{{ key }}</div></button></div>
+      {% endfor %}
+    </div>
+    <div class="small text-muted mt-3">After clicking, watch <a href="{% url 'live' %}">Live Monitoring</a> and <a href="{% url 'alerts' %}">Security Alerts</a>. The alert appears after the next Spark micro-batch (about 15–30 seconds).</div>
+    </div></div></div>
+</div>
+
+<div class="card-soc mb-3" id="dataset-card">
+  <div class="card-head"><h3><i class="bi bi-database-check text-success me-1"></i>Real dataset: UNSW-NB15</h3>
+    <span class="sub">real network flows · UNSW Canberra Cyber Range Lab (2015)</span><span class="ms-auto" id="ds-replay-status"></span></div>
+  <div class="card-body"><div class="row g-3">
+    <div class="col-xl-4">
+      <div class="form-label">Files in <span class="mono">data/datasets/unsw-nb15/</span></div>
+      <div id="ds-files" class="small mb-2"></div>
+      <div class="form-label mt-2">Model trained on the real dataset</div>
+      <div id="ds-model" class="small"></div>
+    </div>
+    <div class="col-xl-4">
+      <div class="form-label">Replay real flows into Kafka (topic <span class="mono">dataset-flows</span>)</div>
+      <div class="row g-2">
+        <div class="col-6"><label class="form-label">Flows</label><input type="number" class="form-control" id="ds-rows" value="5000" min="1" max="700000"></div>
+        <div class="col-6"><label class="form-label">Flows / second</label><input type="number" class="form-control" id="ds-rate" value="50" min="1" max="1000"></div>
+        <div class="col-6"><label class="form-label">Mode</label><select class="form-select" id="ds-mode">
+          <option value="sequential">Sequential (real mix)</option><option value="attack_enriched">Attack-enriched (demo)</option></select></div>
+        <div class="col-6"><label class="form-label">Start at row</label><input type="number" class="form-control" id="ds-start" value="0" min="0"></div>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-accent flex-grow-1" id="ds-start-btn" {% if not is_admin_role %}disabled{% endif %}><i class="bi bi-play-fill me-1"></i>Replay real flows</button>
+        <button class="btn btn-ghost" id="ds-stop-btn" {% if not is_admin_role %}disabled{% endif %}><i class="bi bi-stop-fill"></i> Stop</button>
+      </div>
+      <div class="small text-muted mt-2"><b>Attack-enriched</b> keeps every attack flow and only 5% of normal flows, so alerts appear quickly. This is not the real traffic mix, so use <b>Sequential</b> when you measure results.</div>
+    </div>
+    <div class="col-xl-4">
+      <div class="form-label">Replay progress</div>
+      <div id="ds-progress" class="small"></div>
+    </div>
+  </div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-5"><div class="card-soc h-100">
+    <div class="card-head"><h3><i class="bi bi-upload me-1"></i>Upload a log file</h3><span class="sub">CSV or JSON → Kafka</span></div>
+    <div class="card-body">
+      <form id="upload-form">
+        <input class="form-control mb-2" type="file" name="file" accept=".csv,.json,.jsonl,.ndjson" required {% if not is_admin_role %}disabled{% endif %}>
+        <div class="row g-2 mb-2">
+          <div class="col-7"><label class="form-label">Default log source</label>
+            <select class="form-select" name="default_source"><option value="network">network</option><option value="firewall">firewall</option><option value="authentication">authentication</option><option value="server_access">server_access</option><option value="ids">ids</option></select></div>
+          <div class="col-5 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="replay_now" value="1" id="replay" checked>
+            <label class="form-check-label small" for="replay">Replay as "now"</label></div></div>
+        </div>
+        <button class="btn btn-accent w-100" type="submit" {% if not is_admin_role %}disabled{% endif %}><i class="bi bi-cloud-upload me-1"></i>Validate &amp; publish to Kafka</button>
+      </form>
+      <div class="small text-muted mt-2">Columns: <span class="mono">timestamp, src_ip, dst_ip, src_port, dst_port, protocol, packet_size, duration, request_count, failed_logins, event_type, network_status, log_source, username, label</span>.
+        Common aliases (e.g. <span class="mono">srcip, dstip, sport, dsport, proto, dur, sbytes, attack_cat</span>) are accepted. Invalid rows are rejected and counted. Max 20 MB / 50,000 rows. Sample files: <span class="mono">data/raw/sample_logs.csv</span> and <span class="mono">.json</span>.</div>
+      <div id="upload-result" class="mt-3"></div>
+    </div></div></div>
+
+  <div class="col-xl-7"><div class="card-soc h-100">
+    <div class="card-head"><h3><i class="bi bi-collection me-1"></i>Kafka ingestion status</h3></div>
+    <div class="table-responsive"><table class="table table-soc"><thead><tr><th>Topic</th><th>Partitions</th><th>Total messages produced</th><th>Retained (24 h)</th><th>Sent by generator</th></tr></thead><tbody id="topics"></tbody></table></div>
+    <div class="card-body pt-2"><div class="form-label">Generator output by ground-truth label</div><div id="labels" class="d-flex flex-wrap gap-2"></div></div>
+  </div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h3>Recent scenario requests</h3></div>
+    <div class="table-scroll short"><table class="table table-soc"><thead><tr><th>Scenario</th><th>Requested by</th><th>Requested</th><th>Picked up</th></tr></thead><tbody id="scen"></tbody></table></div></div></div>
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h3>Recent uploads</h3></div>
+    <div class="table-scroll short"><table class="table table-soc"><thead><tr><th>File</th><th>Status</th><th>Rows</th><th>Valid</th><th>Rejected</th><th>Published</th><th>When</th></tr></thead><tbody id="uploads"></tbody></table></div></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/ingestion.js' %}"></script>{% endblock %}

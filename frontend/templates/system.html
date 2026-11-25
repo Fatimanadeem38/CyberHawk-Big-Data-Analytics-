@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Health of Kafka, Spark, HDFS, Elasticsearch and MongoDB.{% endblock %}
+{% block content %}
+<div class="banner mb-3" id="overall"><span class="dot"></span><span>Checking services…</span>
+  <span class="ms-auto small text-muted">auto-refresh every 10 s · <span id="checked"></span></span></div>
+
+<div class="row g-3 mb-3" id="services"></div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-7"><div class="card-soc h-100"><div class="card-head"><h3><i class="bi bi-lightning-charge me-1"></i>Spark processing rate</h3><span class="sub">per micro-batch · last 2 hours</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-spark"></canvas></div></div></div></div>
+  <div class="col-xl-5"><div class="card-soc h-100"><div class="card-head"><h3><i class="bi bi-collection me-1"></i>Kafka topics</h3></div>
+    <div class="table-responsive"><table class="table table-soc"><thead><tr><th>Topic</th><th>Partitions</th><th>Total produced</th><th>Retained</th></tr></thead><tbody id="topics"></tbody></table></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h3><i class="bi bi-hdd-stack me-1"></i>HDFS storage</h3></div>
+    <div class="card-body"><div id="hdfs-cap" class="mb-3"></div>
+    <table class="table table-soc"><thead><tr><th>Folder (/cybersecurity/…)</th><th>Files</th><th>Size</th></tr></thead><tbody id="hdfs"></tbody></table></div></div></div>
+  <div class="col-xl-6"><div class="card-soc h-100"><div class="card-head"><h3><i class="bi bi-search me-1"></i>Elasticsearch indices</h3></div>
+    <div class="card-body"><table class="table table-soc"><thead><tr><th>Index</th><th>Health</th><th>Documents</th><th>Size</th></tr></thead><tbody id="indices"></tbody></table></div></div></div>
+</div>
+
+{% if is_admin_role %}
+<div class="card-soc"><div class="card-head"><h3><i class="bi bi-journal-check me-1"></i>Audit log</h3><span class="sub">latest 50 actions (MongoDB)</span></div>
+  <div class="table-scroll short"><table class="table table-soc"><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Target</th><th>IP</th><th>Details</th></tr></thead><tbody id="audit"></tbody></table></div></div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/system.js' %}"></script>{% endblock %}

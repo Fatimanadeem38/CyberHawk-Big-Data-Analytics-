@@ -1,0 +1,106 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title|default:"SOC" }} · CyberHawk</title>
+  <script>
+    /* apply the saved theme before the page paints (no white flash) */
+    (function () { var t = "dark"; try { t = localStorage.getItem("ch-theme") || "dark"; } catch (e) {}
+      document.documentElement.setAttribute("data-theme", t); document.documentElement.setAttribute("data-bs-theme", t); })();
+  </script>
+  <link rel="icon" href="{% static 'images/cyberhawk-icon.svg' %}" type="image/svg+xml">
+  <link rel="alternate icon" href="{% static 'images/favicon.ico' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/soc.css' %}" rel="stylesheet">
+  {% block head %}{% endblock %}
+</head>
+<body data-page="{{ page_id }}" data-role="{{ user_role }}">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <img class="brand-img" src="{% static 'images/cyberhawk-icon.svg' %}" alt="CyberHawk logo" width="46" height="46">
+    <div>
+      <img class="brand-word" src="{% static 'images/cyberhawk-wordmark-dark.svg' %}" alt="CyberHawk" width="150" height="14">
+      <div class="brand-sub">Threat Detection</div>
+    </div>
+  </div>
+  <div class="nav-section">Monitor</div>
+  <ul class="side-nav">
+    <li><a href="{% url 'dashboard' %}" class="{% if page_id == 'dashboard' %}active{% endif %}"><i class="bi bi-grid-1x2"></i>Dashboard</a></li>
+    <li><a href="{% url 'live' %}" class="{% if page_id == 'live' %}active{% endif %}"><i class="bi bi-activity"></i>Live Monitoring</a></li>
+    <li><a href="{% url 'threats' %}" class="{% if page_id == 'threats' %}active{% endif %}"><i class="bi bi-radar"></i>Threat Detection</a></li>
+    <li><a href="{% url 'alerts' %}" class="{% if page_id == 'alerts' %}active{% endif %}"><i class="bi bi-bell"></i>Security Alerts<span class="badge-count d-none" id="nav-alert-count">0</span></a></li>
+  </ul>
+  <div class="nav-section">Investigate</div>
+  <ul class="side-nav">
+    <li><a href="{% url 'analytics' %}" class="{% if page_id == 'analytics' %}active{% endif %}"><i class="bi bi-bar-chart-line"></i>Network Analytics</a></li>
+    <li><a href="{% url 'history' %}" class="{% if page_id == 'history' %}active{% endif %}"><i class="bi bi-search"></i>Historical Logs</a></li>
+    <li><a href="{% url 'models' %}" class="{% if page_id == 'models' %}active{% endif %}"><i class="bi bi-cpu"></i>ML Models</a></li>
+  </ul>
+  <div class="nav-section">Operate</div>
+  <ul class="side-nav">
+    <li><a href="{% url 'ingestion' %}" class="{% if page_id == 'ingestion' %}active{% endif %}"><i class="bi bi-cloud-arrow-down"></i>Log Ingestion</a></li>
+    <li><a href="{% url 'system' %}" class="{% if page_id == 'system' %}active{% endif %}"><i class="bi bi-hdd-network"></i>System Monitoring</a></li>
+    {% if is_admin_role %}<li><a href="/admin/"><i class="bi bi-people"></i>Users &amp; Admin</a></li>{% endif %}
+  </ul>
+  <div class="sidebar-foot">
+    <div><b><i class="bi bi-shield-check me-1"></i>Detection &amp; alerting only</b></div>
+    <div>CyberHawk watches and alerts. It does not block traffic. Simulated events are marked <span class="sim-tag">sim</span></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <button class="icon-btn d-lg-none" aria-label="Open menu" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="bi bi-list"></i></button>
+    <div class="min-w-0">
+      <div class="crumb">Security Operations Center</div>
+      <h1>{{ page_title }}</h1>
+      <div class="page-sub d-none d-md-block">{% block page_sub %}{% endblock %}</div>
+    </div>
+    <div class="ms-auto d-flex align-items-center gap-2 gap-md-3">
+      <span class="rt-status" id="rt-status" title="Real-time connection (WebSocket)"><span class="dot"></span><span class="txt">Connecting…</span></span>
+      <span class="clock d-none d-xl-inline" id="clock"></span>
+      <button class="icon-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light or dark mode">
+        <i class="bi bi-sun dark-only"></i><i class="bi bi-moon-stars light-only"></i></button>
+      <div class="dropdown">
+        <a href="#" class="user-chip dropdown-toggle text-reset" data-bs-toggle="dropdown">
+          <span class="avatar">{{ user.username|first|upper }}</span>
+          <span class="d-none d-md-inline"><span class="d-block lh-sm user-name">{{ user.username }}</span>
+            <span class="role-badge">{% if user_role == 'admin' %}Administrator{% elif user_role == 'analyst' %}Security Analyst{% else %}No role{% endif %}</span></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          {% if is_admin_role %}<li><a class="dropdown-item" href="/admin/auth/user/"><i class="bi bi-people me-2"></i>Manage users</a></li>{% endif %}
+          <li><form method="post" action="{% url 'logout' %}">{% csrf_token %}
+            <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Sign out</button></form></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    {% if user_role == 'none' %}
+      <div class="banner warn mb-3"><i class="bi bi-exclamation-triangle"></i>Your account has no role yet. Ask an Administrator to add you to the "Security Analyst" group.</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toasts"></div>
+
+<div class="modal fade" id="ipModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title"><i class="bi bi-pc-display-horizontal me-2"></i>IP profile <span class="mono" id="ipModalTitle"></span></h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body" id="ipModalBody"></div>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/common.js' %}"></script>
+<script src="{% static 'js/theme.js' %}"></script>
+<script src="{% static 'js/realtime.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

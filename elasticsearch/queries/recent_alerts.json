@@ -1,0 +1,16 @@
+{
+  "query": {
+    "terms": {
+      "status": [
+        "new",
+        "investigating"
+      ]
+    }
+  },
+  "sort": [
+    {
+      "last_seen": "desc"
+    }
+  ],
+  "size": 20
+}

@@ -1,0 +1,28 @@
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "processed_at": {
+        "gte": "now-24h"
+      }
+    }
+  },
+  "aggs": {
+    "by_category": {
+      "terms": {
+        "field": "threat_category"
+      }
+    },
+    "by_severity": {
+      "terms": {
+        "field": "severity"
+      }
+    },
+    "per_minute": {
+      "date_histogram": {
+        "field": "processed_at",
+        "fixed_interval": "1m"
+      }
+    }
+  }
+}

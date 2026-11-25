@@ -1,0 +1,54 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "refresh_interval": "1s"
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "timestamp": {
+        "type": "date"
+      },
+      "query_name": {
+        "type": "keyword"
+      },
+      "batch_id": {
+        "type": "long"
+      },
+      "num_input_rows": {
+        "type": "long"
+      },
+      "input_rows_per_second": {
+        "type": "float"
+      },
+      "processed_rows_per_second": {
+        "type": "float"
+      },
+      "batch_duration_ms": {
+        "type": "long"
+      },
+      "offsets_behind_latest": {
+        "type": "long"
+      },
+      "threats_in_batch": {
+        "type": "long"
+      },
+      "alerts_in_batch": {
+        "type": "long"
+      },
+      "invalid_rows": {
+        "type": "long"
+      },
+      "duplicates_removed": {
+        "type": "long"
+      },
+      "status": {
+        "type": "keyword"
+      },
+      "message": {
+        "type": "text"
+      }
+    }
+  }
+}

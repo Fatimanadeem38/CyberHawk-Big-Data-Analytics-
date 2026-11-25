@@ -1,0 +1,63 @@
+{% extends "base.html" %}{% load static %}
+{% block page_sub %}Live overview of events, detections and open alerts.{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <div class="text-muted small"><i class="bi bi-broadcast me-1 text-info"></i>Updates automatically through the live connection.</div>
+  <div class="ms-auto seg" id="range">
+    <button data-value="1h">1h</button><button data-value="6h">6h</button>
+    <button data-value="24h" class="active">24h</button><button data-value="7d">7d</button>
+  </div>
+</div>
+
+<div class="banner danger mb-3 d-none" id="dash-error"><i class="bi bi-exclamation-octagon"></i><span></span></div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-xl-3"><div class="card-soc kpi accent"><i class="bi bi-database icon"></i>
+    <div class="label">Events processed</div><div class="value" id="k-total">–</div><div class="hint"><span id="k-range-events">–</span> in selected range</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi high"><i class="bi bi-radar icon"></i>
+    <div class="label">Threat events</div><div class="value" id="k-threats">–</div><div class="hint"><span id="k-threat-rate">–</span> of events in range</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi critical"><i class="bi bi-exclamation-octagon icon"></i>
+    <div class="label">Critical alerts open</div><div class="value" id="k-critical">–</div><div class="hint">status new or investigating</div></div></div>
+  <div class="col-6 col-xl-3"><div class="card-soc kpi medium"><i class="bi bi-exclamation-triangle icon"></i>
+    <div class="label">High alerts open</div><div class="value" id="k-high">–</div><div class="hint"><span id="k-open">–</span> open alerts in total</div></div></div>
+</div>
+
+<div class="card-soc stat-strip mb-3">
+  <div class="stat" style="--sc: var(--low)"><i class="bi bi-check2-circle"></i><div>
+    <div class="label">Normal traffic</div><div class="value" id="k-normal">–</div><div class="hint">classified "normal" by Model A</div></div></div>
+  <div class="stat" style="--sc: var(--amber)"><i class="bi bi-graph-up-arrow"></i><div>
+    <div class="label">Anomaly rate</div><div class="value" id="k-anomaly">–</div><div class="hint"><span id="k-anomaly-n">–</span> anomalous events (Model B)</div></div></div>
+  <div class="stat" style="--sc: var(--blue)"><i class="bi bi-bell"></i><div>
+    <div class="label">Alerts in range</div><div class="value" id="k-alerts">–</div><div class="hint">grouped and de-duplicated</div></div></div>
+  <div class="stat" style="--sc: var(--accent)"><i class="bi bi-hdd-network"></i><div>
+    <div class="label">Traffic volume</div><div class="value" id="k-bytes">–</div><div class="hint">packet size × requests</div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-8"><div class="card-soc h-100">
+    <div class="card-head"><h2><i class="bi bi-activity me-1"></i>Real-time event processing</h2><span class="sub">events and threats per minute · last 60 min (Spark processing time)</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-timeline"></canvas></div></div></div></div>
+  <div class="col-xl-4"><div class="card-soc h-100">
+    <div class="card-head"><h2><i class="bi bi-pie-chart text-info me-1"></i>Threat distribution</h2><span class="sub">by category</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-threats"></canvas></div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-xl-4"><div class="card-soc h-100">
+    <div class="card-head"><h2><i class="bi bi-bar-chart text-info me-1"></i>Alert severity distribution</h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-severity"></canvas></div></div></div></div>
+  <div class="col-xl-8"><div class="card-soc h-100">
+    <div class="card-head"><h2><i class="bi bi-reception-4 text-info me-1"></i>Traffic volume</h2><span class="sub">bytes per minute · last 60 min</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="c-traffic"></canvas></div></div></div></div>
+</div>
+
+<div class="card-soc">
+  <div class="card-head"><h2><i class="bi bi-bell text-info me-1"></i>Recent security alerts</h2>
+    <a class="ms-auto small" href="{% url 'alerts' %}">View all alerts →</a></div>
+  <div class="table-scroll short"><table class="table table-soc table-hover">
+    <thead><tr><th>Severity</th><th>Category</th><th>Source IP</th><th>Destination</th><th>Events</th><th>Detection</th><th>Last seen</th><th>Status</th></tr></thead>
+    <tbody id="recent-alerts"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/dashboard.js' %}"></script>{% endblock %}
